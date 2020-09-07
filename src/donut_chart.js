@@ -52,20 +52,9 @@ mainCanvas.append("text")
           .attr("font-weight", "bold")
           .attr("font-size", "25")
 
-
-let n = 17
-colorbyValue = {}
- 
- for (let i = 0; i < n; ++i) {
-   colorbyValue[data[i].name] = d3.rgb(d3.interpolateSpectral(i / (n - 1))).hex();
- }
-
  color = d3.scaleOrdinal()
         .domain(data.map(d => d.name))
         .range(d3.quantize(t => d3.interpolateSpectral(t * 0.88 + 0.1), data.length))
-
-
-
 
 var arcs = d3.pie()(data.map(function(d) { return d.value; }));
 
@@ -91,7 +80,6 @@ paths.enter()
     .attr("vector-effect", "non-scaling-stroke")
     .style("stroke-width", "2px")
     .style("opacity", 1)
-    //.attr("fill", function(d, i){return colorbyValue[data[i].name]})
     .attr("fill", function(d,i) {return color(data[i].name)})
     .attr("d", arcpath)
  
