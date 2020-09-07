@@ -3,100 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <script type="text/javascript" src="d3/d3.v3.js"></script>
+    <script type="text/javascript" src="d3/d3.v6.js"></script>
 
     <title>d3 Examples</title>
 </head>
 <body>
 
 <header>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-2">
-                <img src="resources/d3logo.png">
-            </div>
-            <div class="col-md-10">
-                <h1 class="logo">D3 Examples</h1>
-                <h4>Richard Dalton</h4>
-                <div class="btn-group btn-group-md" role="group" aria-label="...">
-                    <a href="index.html" class="btn btn-default" role="button">Home</a>
-                    <a href="svg.html" class="btn btn-default" role="button">SVG</a>
-                    <a href="barChart.html" class="btn btn-default" role="button">Bar</a>
-                    <a href="pieChart.html" class="btn btn-default" role="button">Pie</a>
-                    <a href="bubbleChart.html" class="btn btn-default" role="button">Bubble</a>
-                    <a href="force.html" class="btn btn-default" role="button">Force</a>
-                    <a href="globe.html" class="btn btn-default" role="button">Globe</a>
-                    <a href="http://www.d3js.org" class="btn btn-default" role="button">D3.js</a>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-2">
+				<img src="resources/d3logo.png">
+			</div>
+			<div class="col-md-10">
+				<h1 class="logo">D3 V6 Examples</h1>
+				<h4>Fernando Alvarez</h4>
+				<div class="btn-group btn-group-md" role="group" aria-label="...">
+					<a href="index.html" class="btn btn-default" role="button">Home</a>
+
+                    <a href="donut.html" class="btn btn-default" role="button">Donut</a>
+				</div>
+			</div>
+		</div>
+	</div>
 </header>
 
 <div class="container">
     <h3>Data Driven Documents</h3>
     <p>D3 allows document elements to be generated from data. Hence the name Data Driven Documents (D3).</p>
-    <p>In the example below, and array of json key-value pairs are rendered as headings and paragraphs. We append a div
-    for each data item, and then within that div we render a heading for the key and a paragraph for the value.</p>
+    <p>The example below shows the distribution of people by age in the United States. </p>
 
     <div class="col-md-6">
-        <div id="draw_here"></div>
+        <div class="canva"></div>
     </div>
 
     <div class="col-md-6">
 <pre>
-    data = [
-        {"key": "First Heading", "value":"First Paragraph"},
-        {"key": "Second Heading", "value":"Second Paragraph"},
-        {"key": "Third Heading", "value":"Third Paragraph"},
-        {"key": "Fourth Heading", "value":"Fourth Paragraph"},
-        {"key": "Fifth Heading", "value":"Fifth Paragraph"},
-    ];
+const data = [
+    {"name": "<5","value": 19912018},
+    {"name": "5-9","value": 20501982},
+    {"name": "10-14","value": 20679786},
+    {"name": "15-19","value": 21354481},
+    {"name": "20-24","value": 22604232},
+    {"name": "25-29","value": 21698010},
+    {"name": "30-34","value": 21183639},
+    {"name": "35-39","value": 19855782},
+    {"name": "40-44","value": 20796128},
+    {"name": "45-49","value": 21370368},
+    {"name": "50-54","value": 22525490},
+    {"name": "55-59","value": 21001947},
+    {"name": "60-64","value": 18415681},
+    {"name": "65-69","value": 14547446},
+    {"name": "70-74","value": 10587721},
+    {"name": "75-79","value": 7730129},
+    {"name": "80-84","value": 5811429},
+    {"name": "≥85","value": 5938752}];
 
-    //Create SVG element
-    var doc = d3.select("#draw_here");
+const canvas  = d3.select(".canva");
 
-    var doc_item = doc.selectAll("div")
-            .data(data)
-            .enter()
-            .append("div");
+height = 600
+width = 800
 
-    doc_item.append("h4").text(function (d) {
-                return d.key;
-            });
+const svg = canvas.append("svg")
+                .attr("width", width)
+                .attr("height", height);
 
-    doc_item.append("p").text(function (d) {
-        return d.value;
-    })
+const margin = {top: 20, bottom: 70, left: 70, right: 70};
+const graphWidth = 700 - margin.left - margin.right;
+const graphHeight = 700 - margin.top - margin.bottom;
+
+var formatComma = d3.format(",");
+
+    
+const mainCanvas = svg.append("g")
+                        .attr("width", graphWidth / 2)
+                        .attr("height", graphHeight / 2)
+                        .attr("transform", `translate(${margin.left + 300}, 
+                            ${margin.top + 290})`);
+
+                            
+mainCanvas.append("text")
+          .attr("class", "daca-text")
+          .attr("dy", ".85cm")
+          .style("opacity", 0.7)
+          .transition()
+                .duration(1000)
+                .style("opacity", (d,i) => i+0.7)
+          .text("US Population per age")
+          .attr("text-anchor", "middle")
+
+
+let n = 17
+colorbyValue = {}
+ 
+ for (let i = 0; i < n; ++i) {
+   colorbyValue[data[i].name] = d3.rgb(d3.interpolateSpectral(i / (n - 1))).hex();
+ }
+
+
+var arcs = d3.pie()(data.map(function(d) { return d.value; }));
+
+const radius = height / 2;
+
+const arcpath = d3.arc()
+                .innerRadius(radius * 0.6)
+                .outerRadius(radius - 10)
+
+const paths =  mainCanvas.selectAll("path")
+                         .data(arcs)
+
+
+paths.enter()
+    .append("path")
+    .attr("class", "arc")
+    .attr("stroke", "white")
+    .attr("fill", function(d, i){return colorbyValue[data[i].name]})
+    .attr("d", arcpath)
 </pre>
     </div>
 </div>
 
-<script>
-    data = [
-        {"key": "First Heading", "value":"First Paragraph"},
-        {"key": "Second Heading", "value":"Second Paragraph"},
-        {"key": "Third Heading", "value":"Third Paragraph"},
-        {"key": "Fourth Heading", "value":"Fourth Paragraph"},
-        {"key": "Fifth Heading", "value":"Fifth Paragraph"},
-    ];
-
-    //Create SVG element
-    var doc = d3.select("#draw_here");
-
-    var doc_item = doc.selectAll("div")
-            .data(data)
-            .enter()
-            .append("div");
-
-    doc_item.append("h4").text(function (d) {
-                return d.key;
-            });
-
-    doc_item.append("p").text(function (d) {
-        return d.value;
-    })
-</script>
+<script src="src/donut_chart.js"></script>
 
 </body>
 </html>
