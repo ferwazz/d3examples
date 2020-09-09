@@ -18,10 +18,13 @@ const data = [
     {"name": "80-84","value": 5811429},
     {"name": "≥85","value": 5938752}];
 
+const rainbowColors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
+
+
 const canvas  = d3.select(".canva");
 
 height = 500
-width = 1000
+width = 1500
 
 const svg = canvas.append("svg")
                 .attr("width", width*1.2)
@@ -37,20 +40,34 @@ var formatComma = d3.format(",");
 const mainCanvas = svg.append("g")
                         .attr("width", graphWidth / 2)
                         .attr("height", graphHeight / 2)
-                        .attr("transform", `translate(${margin.left + 480}, 
+                        .attr("transform", `translate(${margin.left + 280}, 
                             ${margin.top + 300})`);
 
-                            
+// text in center
 mainCanvas.append("text")
           .attr("class", "daca-text")
-          .attr("dy", "0.2cm")
+          .attr("dy", "-7cm")
+          .style("opacity", 0)
           .transition()
-                .duration(1000)
-                .style("opacity", (d,i) => 0.7-i)
+                .duration(1500)
+                .style("opacity", (d,i) => 1)
           .text("US Population per age")
           .attr("text-anchor", "middle")
           .attr("font-weight", "bold")
+          .style("font-family", "roman")
           .attr("font-size", "25")
+
+          // text for the labels
+mainCanvas.append("text")
+            .attr("class", "daca-text")
+            .attr("dy", "-6.5cm")
+            .attr("dx", "10cm")
+            .style("opacity", 1)
+            .text("Ages")
+            .attr("text-anchor", "middle")
+            .attr("font-weight", "bold")
+            .style("font-family", "roman")
+            .attr("font-size", "25")
 
  color = d3.scaleOrdinal()
         .domain(data.map(d => d.name))
@@ -61,12 +78,12 @@ var arcs = d3.pie()(data.map(function(d) { return d.value; }));
 const radius = height / 2;
 
 const arcpath = d3.arc()
-                .innerRadius(radius * 0.6)
+                .innerRadius(radius * 0)
                 .outerRadius(radius - 10)
 
-var outerArc = d3.arc()
-                .innerRadius(radius * 0.9)
-                .outerRadius(radius * 1.25)
+var innerArc = d3.arc()
+                .innerRadius(radius * 0.4)
+                .outerRadius(radius * 0.8)
 
 
 const paths =  mainCanvas.selectAll("path")
@@ -78,26 +95,63 @@ paths.enter()
     .attr("class", "arc")
     .attr("stroke", "white")
     .attr("vector-effect", "non-scaling-stroke")
-    .style("stroke-width", "2px")
+    .style("stroke-width", "3px")
     .style("opacity", 1)
-    .attr("fill", function(d,i) {return color(data[i].name)})
+    .attr("fill", function(d,i) {return rainbowColors[i]})
+    .on("mouseover",function(d,i) {
+        d3.select(this)
+        .transition()
+                .duration(100)
+                .style("stroke-width", "10px")
+                .attr("stroke", "white")
+                .style("opacity", 0.6)
+
+        var pos = innerArc.centroid(d);
+        pos[0] = pos[0]*(arcs[i].endAngle < Math.PI ? 1.6:1)
+        svg.append("text")
+        .attr("id", "t" + i)
+        .attr("x", 300 + pos[0])
+        .attr("y", 315 + pos[1])
+        .text(formatComma(data[i].value))
+        .style("font-size", "30px")
+        .attr("font-family", "sans-serif")
+        .attr("text-anchor",  (arcs[i].endAngle < Math.PI ? "start":"end"))
+        .attr("font-weight", "bold")              
+    })
+    .on("mouseout", function(d,i) {
+            d3.select("#t" + i).remove()
+            d3.select(this)
+            .transition()
+                .duration(500)
+                .style("stroke-width", "3px")
+                .attr("stroke", "white")
+                .style("opacity", 1)
+    })
     .attr("d", arcpath)
- 
+
 const labels = mainCanvas.selectAll("label")
                             .data(arcs)
 
-const verticalGap = 1
+const verticalgap_labels = 1
+var label_size = 20
+var gap_labels = 1.2
 
-labels.enter()
-            .append('text')
-            .style("opacity", 1)
-            .text( function(d,i) { console.log(data[i].name) ; return data[i].name })
-            .attr('transform', function(d) {
-                var pos = outerArc.centroid(d)
-                return 'translate(' + pos + ')';
-            })
-            .attr("font-weight", "bold")
-            .attr("font-size", "15")
-            .attr("font-family", "sans-serif")
-            .attr("text-anchor", "middle")
+for(var i=0; i < data.length; i++){
+    console.log(i)
+    svg.append("rect")    
+    .attr("x", 700)
+    .attr("y", 100 + i*label_size*gap_labels)
+    .attr("width", label_size)
+    .attr("height", label_size)
+    .style("fill", rainbowColors[i])
+    svg.append("text")
+    .attr("x", 730)
+    .attr("y", 110 + i*label_size*gap_labels)
+    .text(data[i].name)
+    .style("font-size", "15px")
+    .style("font-family", "roman")
+    .attr("alignment-baseline","middle")
+    .attr("font-weight", "bold")
+
+}
 

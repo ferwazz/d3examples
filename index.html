@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<style>
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+</style>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <script type="text/javascript" src="d3/d3.v6.js"></script>
-
+    <script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.js"></script>
+    <script type="text/javascript" src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
     <title>d3 Example</title>
 </head>
 <body>
@@ -36,8 +47,15 @@
     <div class="canva"></div>
     </div>
 
-
-<pre>
+    <div class="container">
+        <h3><strong>Code:</strong></h3>
+    </div>
+<pre style="
+width: 600px;
+margin-left: auto;
+margin-right: auto;
+"
+>
 const data = [
     {"name": "<5","value": 19912018,"category":1},
     {"name": "5-9","value": 20501982,"category":1},
